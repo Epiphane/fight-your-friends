@@ -10,10 +10,12 @@ function requiredProcessEnv(name) {
   return process.env[name];
 }
 
-var env = require('../local.env.js');
+if (process.env.NODE_ENV === 'development') {
+  var env = require('../local.env.js');
 
-for (var param in env) {
-   process.env[param] = env[param];
+  for (var param in env) {
+     process.env[param] = env[param];
+  }
 }
 
 // All configurations will extend these options
