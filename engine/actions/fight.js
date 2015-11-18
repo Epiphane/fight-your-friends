@@ -63,7 +63,8 @@ var Fight = module.exports = {
          return FightController.registerWinner(fight, user).then(function() {
             return {
                type: 'good',
-               md_text: 'You gave up! ' + fight.opponents[0].tag + ' wins!'
+               md_text: 'You gave up! ' + fight.opponents[0].tag + ' wins!',
+               mentions: [fight.opponents[0].say(user.tag + ' gave up! You win!')]
             }
          });
       });
