@@ -14,7 +14,7 @@
 
    User.prototype.toString = function() { return this.name; };
 
-   function indexOf(user_id, compare) {
+   function binSearch(user_id, compare, find) {
       user_id = user_id.user_id || user_id;
       compare = compare || 'user_id';
 
@@ -39,7 +39,11 @@
          ndx = Math.floor((top + bottom) / 2);
       }
 
-      return -1;
+      return find ? -1 : ndx + 1;
+   }
+
+   function indexOf(user_id, compare) {
+      return binSearch(user_id, compare, true);
    }
 
    function addUser(_user) {
@@ -51,11 +55,13 @@
          _user = new User(_user);
       }
 
-      usersByName.splice(_.sortedIndex(users, _user, function(u) { return u.name; }), 0, _user);
-      users.splice(_.sortedIndex(users, _user, function(u) { return u.user_id; }), 0, _user);
+      var nameNdx = binSearch(_user.name, 'name');
+      usersByName.splice(nameNdx, 0, _user);
+      var idNdx = binSearch(_user.user_id);
+      users.splice(idNdx, 0, _user);
 
-      console.log(_.map(usersByName, function(u) { return u.name }));
-      console.log(_.map(users, function(u) { return u.user_id }));
+      // console.log(_.map(usersByName, function(u) { return u.name }));
+      // console.log(_.map(users, function(u) { return u.user_id }));
 
       $('.user-' + _user.user_id).text('@' + _user.name);
    }
@@ -104,7 +110,6 @@
       if (user.name === name) return user.tag;
 
       var ndx = indexOf(name, 'name');
-
       return usersByName[ndx].tag;
    };
 
