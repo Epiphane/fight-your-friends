@@ -29,7 +29,7 @@ module.exports = function(sequelize, DataTypes) {
             stats: function() {
                 if (this._stats) return this._stats;
 
-                var stats = this.getDataValue('stats');
+                var stats = this.getDataValue('stats') || {};
 
                 stats.alignment = stats.alignment || 'none';
                 stats.physical = stats.physical || 0;
@@ -41,13 +41,13 @@ module.exports = function(sequelize, DataTypes) {
                 return stats;
             },
             name: function() {
-                return this.getDataValue('name').ucwords();
+                return (this.getDataValue('name') || '').ucwords();
             },
             desc: function() {
                 var result = '';
 
                 if (this.stats.alignment && this.stats.alignment !== 'none') {
-                    result += '`' + this.stats.alignment.ucwords() + ' ` alignment, ';
+                    result += '`' + this.stats.alignment.ucwords() + '` alignment, ';
                     result += '`' + this.stats.elemental + ' ' + this.stats.alignment + '` & ';
                 }
 

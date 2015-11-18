@@ -1,6 +1,7 @@
 'use strict';
 
 var UserController = require('../controller/user');
+var AIController = require('../controller/ai');
 var FightController = require('../controller/fight');
 
 var Help = require('./help');
@@ -29,6 +30,17 @@ var Fight = module.exports = {
                   md_text: 'Bring it on, ' + opponent.tag + '!',
                   mentions: [opponent.say(user.tag + ' challenges you to a fight! Bring it on!')]
                };
+            }).then(function(result) {
+               if (!opponent.AI) {
+                  return result;
+               }
+               else {
+                  return AIController.move(opponent, channel_id).then(function(res) {
+                     result.next = res;
+                     res.user_id = opponent._id;
+                     return result;
+                  });
+               }
             });
          });
       });

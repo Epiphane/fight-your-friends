@@ -43,6 +43,7 @@ module.exports = function(sequelize, DataTypes) {
    }, {
       getterMethods: {
          tag: function(user) {
+            if (!this.alias) return this._id;
             return this.alias.tag;
          }
       },
@@ -92,16 +93,10 @@ module.exports = function(sequelize, DataTypes) {
          },
 
          say: function(message, type) {
-            if (Array.isArray(message) || typeof(message) === 'string') {
-               message = {
-                  type: type,
-                  md_text: message
-               };
-            }
-
             return {
+               type: type,
                user_id: this._id,
-               attachments: [message]
+               md_text: message
             };
          },
 

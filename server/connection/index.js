@@ -86,6 +86,65 @@ module.exports = function(io) {
       return true;
    };
 
+   Connection.prototype.formatAttachments = function(result) {
+      var self = this;
+      var attachments = {};
+
+      function push(user_id, attach) {
+         attachments[user_id] = attachments[user_id] || [];
+         attachments[user_id].push(attach);
+      }
+
+      function concat(user_id, attachs) {
+         while (attachs.length) {
+            push(user_id, attachs.shift());
+         }
+      }
+
+      if (Array.isArray(result)) {
+         _.forEach(result, function(a) {
+            var formatted = self.formatAttachments(a);
+
+            for (var user_id in formatted) {
+               concat(user_id, formatted[user_id]);
+            }
+         });
+      }
+      else {
+         if (!result.user_id) result.user_id = this.user._id;
+
+         push(result.user_id, {
+            type: result.type || 'good',
+            text: result.text,
+            md_text: result.md_text
+         });
+
+         if (result.next) {
+            var formatted = self.formatAttachments(result.next);
+
+            for (var user_id in formatted) {
+               concat(user_id, formatted[user_id]);
+            }
+         }
+
+         if (result.mentions) {
+            _.forEach(result.mentions, function(mention) {
+               var formatted = self.formatAttachments(mention);
+
+               for (var user_id in formatted) {
+                  concat(user_id, formatted[user_id]);
+               }
+            });
+         }
+
+         if (result.updateUser) {
+            this.sendUserInfo();
+         }
+
+         return attachments;
+      }
+   };
+
    Connection.prototype.send = function(attachment) {
       if (Array.isArray(attachment)) {
          this.socket.emit('attachments', attachment);
@@ -269,15 +328,21 @@ module.exports = function(io) {
          
             if (result.then) {
                result.then(function(res) {
-                  _.forEach(res.mentions, function(mention) {
-                     io.to('user ' + mention.user_id + '_' + self.team_id).emit('attachments', mention.attachments);
-                  });
+                  var formatted = self.formatAttachments(res);
 
-                  if (res.updateUser) {
-                     self.sendUserInfo();
+                  console.log(formatted);
+                  for (var user_id in formatted) {
+                     var attachments = formatted[user_id];
+                     if (user_id === self.user_id) {
+                        self.send(attachments);
+                     }
+                     else if (Array.isArray(attachments)) {
+                        io.to('user ' + user_id + '_' + self.team_id).emit('attachments', attachments);
+                     }
+                     else {
+                        io.to('user ' + user_id + '_' + self.team_id).emit('attachment', attachments);
+                     }
                   }
-
-                  self.send(res);
                }).catch(function(e) {
                   console.log('ERROR', e);
                   if (e.match && e.match(/Usage/)) self.send(new A.Info(e));

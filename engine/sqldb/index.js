@@ -38,6 +38,7 @@ Token.belongsTo(User, { foreignKey: 'user_id' });
 Alias.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Alias, { foreignKey: 'user_id' });
 User.hasMany(Item, { foreignKey: 'user_id', constraints: false });
+Item.belongsTo(User, { foreignKey: 'user_id', constraints: false });
 
 // User has a weapon and armor
 User.belongsTo(Item, { as: 'weapon', foreignKey: 'weapon_id' });

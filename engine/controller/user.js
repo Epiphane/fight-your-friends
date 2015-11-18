@@ -19,7 +19,7 @@ function randomString(length) {
    }
 
    return str;
-}
+};
 
 UserController.create = function(values, team_id) {
    if (!values.password) {

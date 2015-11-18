@@ -4,6 +4,7 @@ var Sequelize = require('sequelize');
 var sqldb = require('../sqldb');
 var Warning = require('../warning');
 
+var AIController = require('./ai');
 var UserController = require('./user');
 
 var Alias = sqldb.Alias;
@@ -111,12 +112,23 @@ FightController.useMove = function(fight, user, move) {
 
       return fight.recordAction(user, messages.join('\n'));
    }).then(function() {
-      console.log(messages);
-      return {
+      var result = {
          type: 'good',
          md_text: messages,
          mentions: [opponent.say(messages, 'warning')]
       };
+
+      if (opponent.AI && opponent.fighting.health > 0) {
+         // Translate the fight so
+         return AIController.move(opponent, fight.channel_id).then(function(res) {
+            res.user_id = opponent._id;
+            result.next = res;
+
+            return result;
+         });
+      }
+
+      return result;
    });
 };
 
@@ -177,7 +189,10 @@ FightController.getOpponents = function(user, fight) {
          {
             model: Alias,
             where: {
-               team_id: user.alias.team_id
+               $or: [
+                  { team_id: user.alias.team_id },
+                  { team_id: 'GLOBAL' }
+               ]
             }
          }
       ]
