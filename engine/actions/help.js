@@ -3,6 +3,7 @@ module.exports = {
       return {
          md_text: [
             '`|name |NAME` : Change your name',
+            '`|[craft]|` : Craft something!',
             '`|fight |@XXX` : Pick a fight with @XXX',
             '`|forefeit|` : forefeit your current fight',
             '`|[status]|` : Get your health, your opponent\'s health, and other info',
