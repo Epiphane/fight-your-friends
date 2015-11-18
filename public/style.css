@@ -1,0 +1,172 @@
+body {
+    background: #000;
+    color: rgb(163, 255, 0);
+    font-size: 26px;
+    font-family: monospace;
+}
+
+.content {
+  width: 74%;
+  float: left;
+  margin-right: 1%;
+}
+
+.user-tag {
+  background: #454545;
+}
+
+.sidebar {
+  width: 25%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  float: left;
+  position: fixed;
+  right: 0;
+  margin-right: 7px;
+  border: 1px solid rgb(163, 255, 0);
+}
+
+.sidebar .header {
+  padding: 4px;
+  font-size: 32px;
+  border-bottom: 1px solid rgb(163, 255, 0);
+}
+
+.commands {
+  list-style-type: none;
+  padding-left: 15px;
+}
+
+.commands li:before {
+  content: '- ';
+}
+
+pre {
+  display: inline;
+  margin: 15px;
+}
+
+code {
+  text-decoration: underline;
+}
+
+armor:before {
+}
+
+armor {
+  color: #88AA00;
+}
+
+weapon:before {
+}
+
+weapon {
+  color: #CC0000;
+}
+
+item {
+  margin-bottom: 20px;
+}
+
+.copypasta {
+  cursor: pointer;
+}
+
+.copypasta:hover {
+  background: #555;
+}
+
+#input .dropdown-menu {
+  margin-left: -48px;
+  list-style-type: none;
+  bottom: 6px!important;
+  background: #ccc;
+  color: rgb(54, 76, 15);
+  padding-left: 0;
+  font-size: 14px;
+  border: 1px solid #777;
+  padding: 0 2px;
+}
+
+.textcomplete-item.active {
+  background: #aaa;
+}
+
+#command {
+  width: 80%;
+  /*opacity: 0;*/
+  background: none;
+  color: rgb(163, 255, 0);
+  border: none;
+  font-family: monospace;
+  font-size: 22px;
+}
+
+#command:focus {
+  border: none;
+  outline: none;
+}
+
+.blink {
+  animation: blink 2s step-end infinite;
+  -webkit-animation: blink 2s step-end infinite;
+}
+
+.attachment {
+  font-size: 16px;
+  padding: 10px;
+  border: 1px solid rgb(163, 255, 0);
+  margin-bottom: 10px;
+}
+
+.attachment.small {
+  border: none;
+  font-size: 16px;
+  padding: 2px;
+  padding-left: 32px;
+}
+
+.attachment.info {
+  border-color: #23D5E4;
+  color: #23D5E4;
+}
+
+.attachment.warning {
+  border-color: #E47123;
+  color: #E47123;
+}
+
+.attachment.error {
+  border-color: #cc0000;
+  color: #cc0000;
+}
+
+.game-title {
+  color: #cc0000;
+}
+
+@keyframes blink {
+  0% {opacity: 1;}
+	50% {opacity: 0;}
+}
+@-webkit-keyframes blink {
+  0% {opacity: 1;}
+  50% {opacity: 0;}
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #fff;
+    text-shadow: none;
+    -webkit-text-fill-color: initial;
+}
+
+body {
+  font-size: 22px;
+}
+
+.attachment.small {
+  padding-left: 28px;
+  font-size: 12px;
+  padding-bottom: 5px;
+}

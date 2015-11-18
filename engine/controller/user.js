@@ -1,0 +1,133 @@
+'use strict';
+
+var sqldb = require('../sqldb');
+
+var User = sqldb.User;
+var Alias = sqldb.Alias;
+var Item = sqldb.Item;
+
+var AliasController = require('./alias');
+
+var UserController = {};
+
+var randomLetters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+function randomString(length) {
+   var str = '';
+
+   while (str.length < length) {
+      str += randomLetters[Math.floor(Math.random() * randomLetters.length)];
+   }
+
+   return str;
+}
+
+UserController.create = function(values, team_id) {
+   if (!values.password) {
+      values.password = randomString(16);
+   }
+
+   return User.create(values).then(function(user) {
+      return Item.bulkCreate([
+         {
+            user_id: user._id,
+            name: 'attack',
+            stats: {
+               alignment: 'none',
+               physical: 15
+            },
+            type: 'move'
+         }, {
+            user_id: user._id,
+            name: 'fists',
+            stats: {
+               alignment: 'none',
+               physical: 15
+            },
+            type: 'item'
+         }, {
+            user_id: user._id,
+            name: 'clothes',
+            stats: {
+               alignment: 'none',
+               physical: 8,
+               defense: 7
+            },
+            type: 'item'
+         }
+      ]).then(function(items) {
+         return user.update({
+            weapon_id: items[1]._id,
+            armor_id: items[2]._id
+         });
+      }).then(function() {
+         return UserController.getAlias(user, team_id);
+      });
+   });
+};
+
+UserController.getAlias = function(user, team_id) {
+   if (user) {
+      return AliasController.getAlias(user, team_id).then(function(alias) {
+         user.alias = alias;
+
+         return user;
+      });
+   }
+
+   return { then: function(cb) { return cb(user); } };
+};
+
+UserController.findById = function(user_id, team_id) {
+   return User.findById(user_id).then(function(user) {
+      return UserController.getAlias(user, team_id);
+   });
+};
+
+UserController.findByEmail = function(email, team_id) {
+   return User.findOne({
+      where: {
+         email: email
+      }
+   }).then(function(user) {
+      return UserController.getAlias(user, team_id);
+   });
+};
+
+UserController.lookup = function(name, team_id) {
+   return User.findAll({
+      include: [{
+         model: Alias,
+         where: {
+            slack_name: { 
+               $iLike: name + '%',
+               $ne: 'Unnamed'
+            },
+            team_id: team_id
+         }
+      }]
+   }).then(function(users) {
+      users.forEach(function(user) { user.alias = user.aliases[0]; });
+
+      return users;
+   });
+};
+
+UserController.findByTag = function(tag, team_id) {
+   return AliasController.findByTag(tag, team_id).then(function(alias) {
+      if (alias) {
+         return User.findOne({
+            where: {
+               _id: alias.user_id
+            }
+         }).then(function(user) {
+            user.alias = alias;
+
+            return user;
+         });
+      }
+
+      return null;
+   });
+};
+
+module.exports = UserController;

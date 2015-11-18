@@ -1,0 +1,40 @@
+<html>
+<head>
+	<title>Echo Chamber</title>
+  <script type="text/javascript" src="jquery-2.1.1.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+   <div class="content">
+      <div class="attachment">
+         Welcome to <span class="game-title">Fight Your Friends</span>!
+      </div>
+
+   	<p id="input" style="text-transform: uppercase; position: relative;">$ <!--<span class="blink">_</span>-->
+
+      <input id="command" type="text" />
+
+      </p>
+   </div>
+   <div class="sidebar">
+      <div class="header">Commands</div>
+      <ul class="commands">
+         <li>Help</li>
+         <li>Status</li>
+         <li>Fight</li>
+         <li>Use (move)</li>
+         <li>Forefeit</li>
+         <li>Equip (item)</li>
+         <li>Items</li>
+         <li>Moves</li>
+      </ul>
+   </div>
+
+   <script type="text/javascript" src="underscore-min.js"></script>
+   <script type="text/javascript" src="jquery.textcomplete.min.js"></script>
+   <script type="text/javascript" src="socket.io.js"></script>
+   <script type="text/javascript" src="attachments.js"></script>
+   <script type="text/javascript" src="game.js"></script>
+   <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
