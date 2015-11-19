@@ -1,16 +1,48 @@
-var Response = module.exports = function(text, type) {
-   this.type = type || 'good';
-   this.text = text;
+var _ = require('lodash');
+
+var Response = module.exports = function() {};
+Response.prototype.isResponse = true;
+Response.prototype.initialize = function() {};
+
+Response.prototype.toAttachment = function(user) {
+   return {};
 };
 
-Response.prototype.isResponse = true;
+Response.prototype.toJSON = function(user) {
+   return {};
+};
 
-Response.extend = function(type) {
-   var extended = function(text, t) {
-      Response.call(this, text, t || type);
-   }
+Response.prototype.toString = function(user) {
+   return '';
+};
 
-   extended.prototype = Response.prototype;
+// function merge(objA, objB) {
+//    var result = {};
 
-   return extended;
+//    for (var key in objA) {
+//       result[key] = objA[key];
+//    }
+
+//    for (var key in objA) {
+//       result[key] = objA[key];
+//    }
+
+//    return result;
+// }
+
+function extend(parent, proto) {
+   var child = function() {
+      // this.parent.constructor.apply(this, arguments);
+      this.initialize.apply(this, arguments);
+   };
+
+   proto = proto || {};
+   child.prototype = _.merge({}, parent.prototype, proto);
+   child.extend = _.curry(extend)(child);
+
+   child.prototype.parent = parent.prototype;
+
+   return child;
 }
+
+Response.extend = _.curry(extend)(Response);

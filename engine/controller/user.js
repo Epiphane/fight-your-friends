@@ -7,6 +7,7 @@ var Alias = sqldb.Alias;
 var Item = sqldb.Item;
 
 var AliasController = require('./alias');
+var AppController = require('./app');
 
 var UserController = {};
 
@@ -65,9 +66,9 @@ UserController.create = function(values, team_id) {
    });
 };
 
-UserController.getAlias = function(user, team_id) {
+UserController.getAlias = function(user, team_id, slack_user_id) {
    if (user) {
-      return AliasController.getAlias(user, team_id).then(function(alias) {
+      return AliasController.getAlias(user, team_id, slack_user_id).then(function(alias) {
          user.alias = alias;
 
          return user;
@@ -77,19 +78,51 @@ UserController.getAlias = function(user, team_id) {
    return { then: function(cb) { return cb(user); } };
 };
 
-UserController.findById = function(user_id, team_id) {
+UserController.findById = function(user_id, team_id, slack_user_id) {
    return User.findById(user_id).then(function(user) {
-      return UserController.getAlias(user, team_id);
+      return UserController.getAlias(user, team_id, slack_user_id);
    });
 };
 
-UserController.findByEmail = function(email, team_id) {
+UserController.findBySlackId = function(slack_user_id, team_id) {
+   return User.findOne({
+      include: {
+         model: Alias,
+         where: {
+            slack_user_id: slack_user_id,
+            team_id: team_id
+         }
+      }
+   }).then(function(user) {
+      if (user) {
+         user.alias = user.aliases[0];
+         return user;
+      }
+
+      // Create a user and alias
+      return AppController.getUserInfo(team_id, slack_user_id).then(function(profile) {
+         var email = profile.email;
+
+         return UserController.findByEmail(email, team_id, slack_user_id).then(function(user) {
+            if (user) return user;
+
+            return UserController.create({
+               email: email
+            });
+         }).then(function(user) {
+            return UserController.getAlias(user, team_id, slack_user_id);
+         });
+      })
+   })
+};
+
+UserController.findByEmail = function(email, team_id, slack_user_id) {
    return User.findOne({
       where: {
          email: email
       }
    }).then(function(user) {
-      return UserController.getAlias(user, team_id);
+      return UserController.getAlias(user, team_id, slack_user_id);
    });
 };
 

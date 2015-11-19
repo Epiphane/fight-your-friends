@@ -1,1 +1,3 @@
-module.exports = require('./response').extend('warning');
+module.exports = require('./message').extend({
+   color: 'warning'
+});

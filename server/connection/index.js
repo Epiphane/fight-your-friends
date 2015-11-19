@@ -328,21 +328,25 @@ module.exports = function(io) {
          
             if (result.then) {
                result.then(function(res) {
-                  var formatted = self.formatAttachments(res);
+                  self.send(_.map(res, function(attachment) {
+                     return attachment.toAttachment(self.user);
+                  }));
 
-                  console.log(formatted);
-                  for (var user_id in formatted) {
-                     var attachments = formatted[user_id];
-                     if (user_id === self.user_id) {
-                        self.send(attachments);
-                     }
-                     else if (Array.isArray(attachments)) {
-                        io.to('user ' + user_id + '_' + self.team_id).emit('attachments', attachments);
-                     }
-                     else {
-                        io.to('user ' + user_id + '_' + self.team_id).emit('attachment', attachments);
-                     }
-                  }
+                  // var formatted = self.formatAttachments(res);
+
+                  // console.log(formatted);
+                  // for (var user_id in formatted) {
+                  //    var attachments = formatted[user_id];
+                  //    if (user_id === self.user_id) {
+                  //       self.send(attachments);
+                  //    }
+                  //    else if (Array.isArray(attachments)) {
+                  //       io.to('user ' + user_id + '_' + self.team_id).emit('attachments', attachments);
+                  //    }
+                  //    else {
+                  //       io.to('user ' + user_id + '_' + self.team_id).emit('attachment', attachments);
+                  //    }
+                  // }
                }).catch(function(e) {
                   console.log('ERROR', e);
                   if (e.match && e.match(/Usage/)) self.send(new A.Info(e));

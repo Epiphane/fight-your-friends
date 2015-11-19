@@ -1,1 +1,3 @@
-module.exports = require('./response').extend('error');
+var Error = module.exports = require('./message').extend({
+   color: 'danger'
+});

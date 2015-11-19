@@ -5,7 +5,7 @@ var sqldb = require('../sqldb');
 var Alias = sqldb.Alias;
 var AliasController = {};
 
-AliasController.getAlias = function(user, team_id) {
+AliasController.getAlias = function(user, team_id, slack_user_id) {
    return Alias.findOne({
       where: {
          user_id: user._id,
@@ -15,7 +15,8 @@ AliasController.getAlias = function(user, team_id) {
       if (alias) return alias;
       else return Alias.create({
          user_id: user._id,
-         team_id: team_id
+         team_id: team_id,
+         slack_user_id: slack_user_id
       });
    });
 };

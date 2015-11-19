@@ -11,8 +11,18 @@ var TokenController = require('./controller/token');
 
 var Engine = module.exports = {};
 
+Engine.A = Engine.Response = require('./actions/response');
+
+Engine.getSlackApp = function(team_id) {
+   return sqldb.App.findById(team_id);
+};
+
 Engine.findUserByEmail = function(email, team_id) {
    return UserController.findByEmail(email, team_id);
+};
+
+Engine.findUserBySlackId = function(slack_id, team_id) {
+   return UserController.findBySlackId(slack_id, team_id);
 };
 
 Engine.findUserById = function(user_id, team_id) {

@@ -24,6 +24,7 @@ function importModel(name) {
 }
 
 // Insert models below
+var App       = db.App = importModel('app');
 var User      = db.User = importModel('user');
 var Alias     = db.Alias = importModel('alias');
 var Fight     = db.Fight = importModel('fight');
