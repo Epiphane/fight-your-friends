@@ -84,3 +84,5 @@ var Status = module.exports = {
       });
    }
 };
+
+module.exports = function() { return Status; };

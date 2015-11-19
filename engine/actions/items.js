@@ -99,3 +99,5 @@ var Items = module.exports = {
    forget: function(user, channel_id, argv) { return drop(user, argv, 'move', 'forgotten'); },
    drop: function(user, channel_id, argv) { return drop(user, argv, 'item', 'dropped'); },
 };
+
+module.exports = function() { return Items; };
