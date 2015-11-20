@@ -1,10 +1,18 @@
 describe('User', function() {
    var users;
+   var thomas;
 
    before(function() {
       return Seed().then(function() {
          return UserController.findAll(Seed.TEAM).then(function(u) {
             users = u;
+
+            if (users[0].email === 'exyphnos@gmail.com') {
+               thomas = users[0];
+            }
+            else {
+               thomas = users[1];
+            }
          });
       });
    });
@@ -23,7 +31,7 @@ describe('User', function() {
 
          return user.aliases[0].destroy().then(function() {
             return user.destroy();
-         })
+         });
       });
    });
 
@@ -78,6 +86,34 @@ describe('User', function() {
                });
             });
          });
-      })
+      });
    });
+
+   describe('UserController.findById', function() {
+      it('should locate each user by ID', function() {
+         return UserController.findById(thomas._id, Seed.TEAM).then(function(user) {
+            expect(user).to.exist;
+            expect(user).to.have.property('alias');
+            expect(user.alias.team_id).to.equal(Seed.TEAM);
+            expect(user.tag).to.equal('<@UTSTEINKE>');
+         });
+      });
+
+      it('should allow login on any team', function() {
+         return UserController.findById(thomas._id, 'TESTTEAM1', 'UTHOMAS').then(function(user) {
+            expect(user).to.exist;
+            expect(user).to.have.property('alias');
+            expect(user.alias.team_id).to.equal('TESTTEAM1');
+            expect(user.tag).to.equal('<@UTHOMAS>');
+         });
+      });
+   });
+
+   // describe('UserController.findBySlackId', function() {
+   //    it('should locate the user by their slack ID', function() {
+   //       return UserController.findBySlackId('<@UTSTEINKE>', Seed.TEAM).then(function(user) {
+   //          expect(user).to.exist;
+   //       });
+   //    });
+   // });
 });

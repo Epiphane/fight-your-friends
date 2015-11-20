@@ -17,9 +17,10 @@ var Fighting = sqldb.Fighting;
 var Item = sqldb.Item;
 var Token = sqldb.Token;
 var Alias = sqldb.Alias;
+var App = sqldb.App;
 
-var modelsSmallToLarge = [Alias, Token, Fighting, Action, Fight, User, Item];
-var modelsLargeToSmall = [Item, User, Fight, Action, Fighting, Token, Alias];
+var modelsSmallToLarge = [App, Alias, Token, Fighting, Action, Fight, User, Item];
+var modelsLargeToSmall = [Item, User, Fight, Action, Fighting, Token, Alias, App];
 
 module.exports = function() {
    var LOG = function(message) { 
@@ -35,7 +36,10 @@ module.exports = function() {
             password: 'thomas'
          }, module.exports.TEAM).then(function(thomas) {
 
-            thomas.alias.update({ slack_name: 'epiphane' });
+            thomas.alias.update({
+               slack_user_id: 'UTSTEINKE',
+               slack_name: 'thomassteinke'
+            });
             
             LOG('Creating slackbot...');
             return UserController.create({
@@ -44,7 +48,10 @@ module.exports = function() {
                AI: true
             }, module.exports.TEAM).then(function(slackbot) {
                
-               slackbot.alias.update({ slack_name: 'slackbot' });
+               slackbot.alias.update({
+                  slack_user_id: 'USLACKBOT',
+                  slack_name: 'slackbot'
+               });
 
                LOG('Creating basic fight...');
                return FightController.create(module.exports.CHANNEL, thomas, slackbot);

@@ -19,7 +19,7 @@ describe('Seed', function() {
             expect(user).to.have.property('alias');
             expect(user.alias.slack_name).to.be.a('string');
             expect(user.alias.team_id).to.equal(Seed.TEAM);
-            expect(user.tag).to.match(/^<#[0-9]+>$/);
+            expect(user.tag).to.match(/^<@[A-Z]+>$/);
          });
       });
 
