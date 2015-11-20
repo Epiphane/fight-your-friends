@@ -1,5 +1,6 @@
 'use strict';
 
+var _ = require('lodash');
 var assert = require('../actions/assert');
 
 var sqldb = require('../sqldb');
@@ -10,6 +11,12 @@ var Item = sqldb.Item;
 var AliasController = require('./alias');
 var AppController = require('./app');
 var UserController = {};
+
+// Restrict methods on db.User model
+var PrivateUserMethods = {};
+_.forEach(['findOne', 'findAll', 'findById'], function(methodName) {
+   PrivateUserMethods[methodName] = User[methodName].bind(User);
+});
 
 var randomLetters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 function randomString(length) {
@@ -24,6 +31,7 @@ function randomString(length) {
 
 UserController.create = function(values, team_id) {
    assert(team_id, 'Team ID is required');
+   assert(values.email, 'Email is required');
 
    if (!values.password) {
       values.password = randomString(16);
@@ -78,6 +86,23 @@ UserController.getAlias = function(user, team_id, slack_user_id) {
    }
 
    return { then: function(cb) { return cb(user); } };
+};
+
+UserController.findAll = function(team_id, params) {
+   params = params || {};
+   params.include = params.include || [];
+   params.include.push({
+      model: Alias,
+      where: { team_id: team_id }
+   });
+
+   return User.findAll(params).then(function(users) {
+      _.forEach(users, function(user) {
+         user.alias = user.aliases[0];
+      });
+
+      return users;
+   });
 };
 
 UserController.findById = function(user_id, team_id, slack_user_id) {

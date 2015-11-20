@@ -33,7 +33,7 @@ module.exports = function() {
          return UserController.create({
             email: 'exyphnos@gmail.com',
             password: 'thomas'
-         }, 'THOMASSTEINKE').then(function(thomas) {
+         }, module.exports.TEAM).then(function(thomas) {
 
             thomas.alias.update({ slack_name: 'epiphane' });
             
@@ -42,12 +42,12 @@ module.exports = function() {
                email: 'slackbot@thomassteinke.com',
                password: 'slackbot',
                AI: true
-            }, 'THOMASSTEINKE').then(function(slackbot) {
+            }, module.exports.TEAM).then(function(slackbot) {
                
                slackbot.alias.update({ slack_name: 'slackbot' });
 
                LOG('Creating basic fight...');
-               return FightController.create('TEST', thomas, slackbot);
+               return FightController.create(module.exports.CHANNEL, thomas, slackbot);
             });
          });
       });
@@ -80,4 +80,6 @@ module.exports = function() {
       });
    });
 };
+module.exports.TEAM = 'THOMASSTEINKE';
+module.exports.CHANNEL = 'TEST';
 module.exports.silent = false;

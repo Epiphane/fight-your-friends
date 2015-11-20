@@ -29,7 +29,7 @@ module.exports = function(sequelize, DataTypes) {
       },
       level: {
          type: DataTypes.INTEGER,
-         defaultValue: 0
+         defaultValue: 1
       },
       experience: {
          type: DataTypes.INTEGER,
