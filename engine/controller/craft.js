@@ -4,6 +4,8 @@ require('../util');
 
 var _ = require('lodash');
 var sqldb = require('../sqldb');
+var assert = require('../actions/assert');
+var A = require('../actions/response');
 
 var Fighting = sqldb.Fighting;
 var Fight = sqldb.Fight;
@@ -83,10 +85,7 @@ CraftController.generateQuestion = (function() {
    };
 
    return function(item) {
-      return {
-         type: 'good',
-         md_text: generateQuestion(item)
-      }
+      return new A.Good(generateQuestion(item));
    };
 })()
 
@@ -128,9 +127,7 @@ CraftController.incStats = function(stats, trait) {
 };
 
 CraftController.abort = function(user, session) {
-   if (!session) {
-      return new Warning('You are not crafting anything.');
-   }
+   assert (session, 'You are not crafting anything.');
 
    return Item.update({
       deleted: true
@@ -151,17 +148,14 @@ CraftController.abort = function(user, session) {
    }).then(function() {
       return session.recordAction(user, user.tag + ' aborted item creation.');
    }).then(function() {
-      return {
-         type: 'warning',
-         md_text: 'Crafting aborted!'
-      };
+      return new A.Warning('Crafting aborted!');
    });
 };
 
 CraftController.handle = function(user, session, response) {
    return session.recordAction(user, 'User response: ' + response).then(function() {
       return Item.findById(session.fighting.health).then(function(item) {
-         if (!item) throw new Warning('Error finding item in DB');
+         assert(item, 'Error finding item in DB');
 
          if (response) { 
             if (!item.name) return item.update({ name: response });
@@ -249,10 +243,7 @@ CraftController.handle = function(user, session, response) {
                      return session.recordAction(user, item.name + ' created!');
                   }).then(function() {
                      // Cut execution here
-                     throw {
-                        type: 'good',
-                        md_text: item.name + ' created!'
-                     };
+                     throw new A.Good(item.name + ' created!');
                   })
                }
 
@@ -296,12 +287,9 @@ CraftController.findSession = function(user, channel_id) {
    return FightController.findFight(user, channel_id, true).then(function(fight) {
       if (fight) {
          return CraftController.getCraftbot().then(function(craftbot) {
-            if (fight.opponents[0]._id !== craftbot._id) {
-               throw new Warning('You cannot craft in the middle of a fight!');
-            }
-            else {
-               return fight;
-            }
+            assert(fight.opponents[0]._id === craftbot._id, 'You cannot craft in the middle of a fight!');
+         
+            return fight;
          });
       }
 

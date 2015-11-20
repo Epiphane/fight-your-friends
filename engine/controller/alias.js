@@ -22,7 +22,6 @@ AliasController.getAlias = function(user, team_id, slack_user_id) {
 };
 
 AliasController.findByTag = function(tag, team_id) {
-   console.log(tag, team_id);
    if (tag.match(/^<@(.*)>$/)) {
       tag = tag.replace(/^<@(.*)>$/g, '$1');
 

@@ -185,7 +185,17 @@
          this.confirm = !!confirm;
       },
       insertAttachment: function(attachment) {
-         var element = $('<div class="attachment ' + (attachment.color || 'info') + '">');
+         var element = $('<div class="attachment ' + (attachment.size || 'normal') + '">');
+
+         if (['good', 'danger', 'warning'].indexOf(attachment.color) >= 0) {
+            element.addClass(attachment.color);
+         }
+         else {
+            element.css({
+               'border-color': attachment.color,
+               'color': attachment.color
+            });
+         }
 
          if (!Array.isArray(attachment.text)) {
             attachment.text = [attachment.text];

@@ -19,21 +19,10 @@ module.exports = function(A, assert) {
                return FightController.requireNoFight(opponent, channel_id).then(function() {
 
                   return FightController.create(channel_id, user, opponent);
-               }).then(function() {
-                  return [
-                     new A.Good('Bring it on, ' + opponent.tag + '!'),
-                     new A.Warning(opponent, user.tag + ' challenges you to a fight! Bring it on!')
-                  ];
                }).then(function(result) {
-                  if (!opponent.AI) {
-                     return result;
-                  }
-                  else {
-                     return AIController.move(opponent, channel_id).then(function(res) {
-                        result.concat(res);
-                        return result;
-                     });
-                  }
+                  result.unshift(new A.Good('Bring it on, ' + opponent.tag + '!'));
+                  result.unshift(new A.Warning(opponent, user.tag + ' challenges you to a fight! Bring it on!'));
+                  return result;
                });
             });
          });

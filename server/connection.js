@@ -145,15 +145,28 @@ module.exports = function(io) {
       }
    };
 
-   Connection.prototype.send = function(attachment) {
-      if (Array.isArray(attachment)) {
+   Connection.prototype.send = function(attachments) {
+      if (Array.isArray(attachments)) {
          var self = this;
-         this.socket.emit('attachments', _.map(res, function(attachment) {
-            return attachment.toAttachment(self.user);
-         }));
+         var byUserId = _.groupBy(attachments, function(attachment) {
+            return attachment.user_id || self.user._id
+         });
+
+         for (var user_id in byUserId) {
+            var toSend = _.map(byUserId[user_id], function(attachment) {
+               return attachment.toAttachment(self.user);
+            });
+            if (user_id === this.user._id) {
+               this.socket.emit('attachments', toSend);
+            }
+            else {
+               io.to('user ' + user_id + '_' + self.team_id).emit('attachments', toSend);
+            }
+         }
+
       }
       else {
-         this.socket.emit('attachment', attachment.toAttachment(this.user));
+         this.socket.emit('attachment', attachments.toAttachment(this.user));
       }
    };
 
@@ -192,10 +205,7 @@ module.exports = function(io) {
          }
          else {
             self.socket.emit('team');
-            self.send({
-               type: 'small',
-               text: 'Enter your email to log in.'
-            });
+            self.send(new A.Small('Enter your email to log in.'));
          }
       })
    };

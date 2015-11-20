@@ -44,7 +44,7 @@ UserController.create = function(values, team_id) {
             name: 'attack',
             stats: {
                alignment: 'none',
-               physical: 15
+               physical: 35
             },
             type: 'move'
          }, {
@@ -52,7 +52,7 @@ UserController.create = function(values, team_id) {
             name: 'fists',
             stats: {
                alignment: 'none',
-               physical: 15
+               physical: 35
             },
             type: 'item'
          }, {
@@ -60,8 +60,8 @@ UserController.create = function(values, team_id) {
             name: 'clothes',
             stats: {
                alignment: 'none',
-               physical: 8,
-               defense: 7
+               physical: 28,
+               defense: 10
             },
             type: 'item'
          }

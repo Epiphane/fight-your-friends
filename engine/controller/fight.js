@@ -3,6 +3,7 @@
 var Sequelize = require('sequelize');
 var sqldb = require('../sqldb');
 var assert = require('../actions/assert');
+var A = require('../actions/response');
 
 var AIController = require('./ai');
 var UserController = require('./user');
@@ -23,6 +24,13 @@ FightController.create = function(channel_id, user1, user2) {
    }).then(function(fight) {
       return fight.addUsers([ user1, user2 ]).then(function() {
          fight.recordAction(user1, user1.tag + ' challenges ' + user2.tag + '!');
+      }).then(function(action) {
+         if (user2.AI) {
+            return AIController.move(user2, fight.channel_id);
+         }
+         else {
+            return []; // No announcement
+         }
       });
    });
 };
@@ -112,21 +120,19 @@ FightController.useMove = function(fight, user, move) {
 
       return fight.recordAction(user, messages.join('\n'));
    }).then(function() {
-      var result = {
-         type: 'good',
-         md_text: messages,
-         mentions: [opponent.say(messages, 'warning')]
-      };
-
       if (opponent.AI && opponent.fighting.health > 0) {
          // Translate the fight so
-         return AIController.move(opponent, fight.channel_id).then(function(res) {
-            res.user_id = opponent._id;
-            result.next = res;
-
-            return result;
-         });
+         return AIController.move(opponent, fight.channel_id);
       }
+      return [];
+   }).then(function(res) {
+      var result = [
+         new A.Good(user, messages),
+         new A.Warning(opponent, messages)
+      ];
+
+      var message;
+      while (message = res.shift()) result.push(message);
 
       return result;
    });
@@ -205,7 +211,7 @@ FightController.getOpponents = function(user, fight) {
 
 FightController.requireNoFight = function(user, channel_id, getOpponents) {
    return FightController.findFight(user, channel_id, getOpponents).then(function(fight) {
-      assert(fight, 'You\'re already in a fight!');
+      assert(!fight, 'You\'re already in a fight!');
    })
 };
 
@@ -227,9 +233,7 @@ FightController.requireTurn = function(user, channel_id, getOpponents) {
          },
          order: '_id DESC'
       }).then(function(actions) {
-         if (actions.length && actions[0].user_id === user._id) {
-            throw new Warning('It is not your turn! (if your opponent does not go for 5 minutes, it will become your turn)');
-         }
+         assert(actions.length === 0 || actions[0].user_id !== user._id, 'It is not your turn! (if your opponent does not go for 5 minutes, it will become your turn)');
 
          return fight;
       });
