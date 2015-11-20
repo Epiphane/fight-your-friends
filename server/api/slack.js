@@ -53,7 +53,7 @@ Responder.prototype.send = function(responses) {
       if (app) {
          // Format package...
          var attachments = _.map(responses, function(response) {
-            return response.toAttachment(self.user);
+            return response.toSlackAttachment(self.user);
          });
 
          return request('https://slack.com/api/chat.postMessage', {

@@ -24,7 +24,11 @@ module.exports = require('./response').extend({
    },
    toSlackAttachment: function(user) {
       if (this.user_id === null || this.user_id === user._id) {
-         return this.toAttachment(user);
+         var attachment = this.toAttachment(user);
+
+         attachment.text = attachment.text.replace(/[\[\]\|]/g, '');
+
+         return attachment;
       }
       else {
          return null;
