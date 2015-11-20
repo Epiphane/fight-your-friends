@@ -1,14 +1,14 @@
 'use strict';
 
-var sqldb = require('../sqldb');
+var assert = require('../actions/assert');
 
+var sqldb = require('../sqldb');
 var User = sqldb.User;
 var Alias = sqldb.Alias;
 var Item = sqldb.Item;
 
 var AliasController = require('./alias');
 var AppController = require('./app');
-
 var UserController = {};
 
 var randomLetters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
@@ -23,6 +23,8 @@ function randomString(length) {
 };
 
 UserController.create = function(values, team_id) {
+   assert(team_id, 'Team ID is required');
+
    if (!values.password) {
       values.password = randomString(16);
    }

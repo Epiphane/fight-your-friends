@@ -10,7 +10,7 @@ function requiredProcessEnv(name) {
   return process.env[name];
 }
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
   var env = require('../local.env.js');
 
   for (var param in env) {

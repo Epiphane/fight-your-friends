@@ -4,11 +4,11 @@ var Response = module.exports = function() {};
 Response.prototype.isResponse = true;
 Response.prototype.initialize = function() {};
 
-Response.prototype.toAttachment = function(user) {
-   return {};
+Response.prototype.toSlackAttachment = function(user) {
+   return this.toAttachment(user);
 };
 
-Response.prototype.toJSON = function(user) {
+Response.prototype.toAttachment = function(user) {
    return {};
 };
 

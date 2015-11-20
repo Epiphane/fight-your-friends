@@ -1,16 +1,14 @@
 'use strict';
 
 // Test specific configuration
-// ===========================
+// ==================================
 module.exports = {
   sequelize: {
-    uri: 'sqlite://',
+    uri: process.env.TEST_DATABASE_URL,
     options: {
-      logging: false,
-      storage: 'test.sqlite',
-      define: {
-        timestamps: false
-      }
+      dialog: 'postgres',
+      port: 5432,
+      logging: false
     }
   }
 };

@@ -2,7 +2,7 @@ var A = require('./response');
 
 var assert = module.exports = function(statement, message, type) {
    if (!statement) {
-      if (message) throw new A.Warning(message, type);
+      if (message) throw new A.Warning(message);
       else {
          console.error('Assertion failed!');
          console.trace();

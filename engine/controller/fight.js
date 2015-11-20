@@ -2,7 +2,7 @@
 
 var Sequelize = require('sequelize');
 var sqldb = require('../sqldb');
-var Warning = require('../warning');
+var assert = require('../actions/assert');
 
 var AIController = require('./ai');
 var UserController = require('./user');
@@ -15,7 +15,7 @@ var Fight = sqldb.Fight;
 var FightController = {};
 
 FightController.create = function(channel_id, user1, user2) {
-   if (user1._id === user2._id) throw new Warning('You cannot fight yourself!');
+   assert(user1._id !== user2._id, 'You cannot fight yourself!');
 
    return Fight.create({
       channel_id: channel_id,
@@ -205,13 +205,13 @@ FightController.getOpponents = function(user, fight) {
 
 FightController.requireNoFight = function(user, channel_id, getOpponents) {
    return FightController.findFight(user, channel_id, getOpponents).then(function(fight) {
-      if (fight) throw new Warning('You\'re already in a fight!');
+      assert(fight, 'You\'re already in a fight!');
    })
 };
 
 FightController.requireFight = function(user, channel_id, getOpponents) {
    return FightController.findFight(user, channel_id, getOpponents).then(function(fight) {
-      if (!fight) throw new Warning('You cannot do that unless you\'re in a fight!');
+      assert(fight, 'You cannot do that unless you\'re in a fight!');
 
       return fight;
    });

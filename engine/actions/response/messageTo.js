@@ -5,12 +5,6 @@ module.exports = require('./response').extend({
    size: 'normal',
    user_id: null,
    initialize: function(user, text, color) {
-      if (!user._id) {
-         color = text;
-         text = user;
-         user = null;
-      }
-
       this.color = color || this.color;
       this.text = text;
 
@@ -23,7 +17,7 @@ module.exports = require('./response').extend({
       }
    },
    toSlackAttachment: function(user) {
-      if (this.user_id === null || this.user_id === user._id) {
+      if (this.user_id === null) {
          return this.toAttachment(user);
       }
       else {

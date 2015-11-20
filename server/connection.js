@@ -1,5 +1,5 @@
-var Engine  = require('../../engine');
-var A       = require('../attachments');
+var Engine  = require('../engine');
+var A       = Engine.Response;
 var _       = require('lodash');
 
 module.exports = function(io) {
@@ -147,10 +147,13 @@ module.exports = function(io) {
 
    Connection.prototype.send = function(attachment) {
       if (Array.isArray(attachment)) {
-         this.socket.emit('attachments', attachment);
+         var self = this;
+         this.socket.emit('attachments', _.map(res, function(attachment) {
+            return attachment.toAttachment(self.user);
+         }));
       }
       else {
-         this.socket.emit('attachment', attachment)
+         this.socket.emit('attachment', attachment.toAttachment(this.user));
       }
    };
 
@@ -313,6 +316,14 @@ module.exports = function(io) {
       });
    };
 
+   Connection.prototype.sendError = function(tag, e) {
+      console.error(tag, e);
+      if (!(e.isResponse || (Array.isArray(e) && e[0].isResponse))) {
+         e = new Engine.A.Error('Error: ' + e.message);
+      }
+      return this.send(e);
+   }
+
    Connection.prototype.act = function(command) {
       if (!this.channel_id) {
          this.send(new A.Error('Channel ID not set'));
@@ -328,9 +339,7 @@ module.exports = function(io) {
          
             if (result.then) {
                result.then(function(res) {
-                  self.send(_.map(res, function(attachment) {
-                     return attachment.toAttachment(self.user);
-                  }));
+                  self.send(res);
 
                   // var formatted = self.formatAttachments(res);
 
@@ -348,10 +357,7 @@ module.exports = function(io) {
                   //    }
                   // }
                }).catch(function(e) {
-                  console.log('ERROR', e);
-                  if (e.match && e.match(/Usage/)) self.send(new A.Info(e));
-                  else if (e.type) self.send(e);
-                  else self.send(new A.Error('ERROR: ' + e.message || e));
+                  self.sendError('S Error 1:', e);
                });
             }
             else if (typeof(result) === 'string') {
@@ -362,10 +368,7 @@ module.exports = function(io) {
             }
          }
          catch (e) {
-            console.log('ERROR', e);
-            if (e.match && e.match(/Usage/)) self.send(new A.Info(e));
-            else if (e.type) self.send(e);
-            else self.send(new A.Error('ERROR: ' + e.message || e));
+            self.sendError('S Error 2:', e);
          }
       }
       else {

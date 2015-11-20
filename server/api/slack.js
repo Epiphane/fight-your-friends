@@ -117,6 +117,5 @@ module.exports = function(req, res) {
       });
    }).catch(function(e) {
       res.json(e).end();
-      // res.status(500).json(e).end();
    });
 };

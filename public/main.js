@@ -185,14 +185,14 @@
          this.confirm = !!confirm;
       },
       insertAttachment: function(attachment) {
-         var element = $('<div class="attachment ' + (attachment.type || 'info') + '">');
+         var element = $('<div class="attachment ' + (attachment.color || 'info') + '">');
 
-         attachment.md_text = attachment.md_text || attachment.text;
-         if (!Array.isArray(attachment.md_text)) {
-            attachment.md_text = [attachment.md_text];
+         if (!Array.isArray(attachment.text)) {
+            attachment.text = [attachment.text];
          }
-         attachment.md_text = attachment.md_text
+         attachment.text = attachment.text
             .join('<br />')
+            .replace(/\n/g, '<br />')
             .replace(/<#([0-9]+)>/g, function(tag, id) {
                return '<span class="user-tag user-' + id + '">' + Game.lookup(tag) + '</span>'
             })
@@ -204,7 +204,7 @@
                return '<span class="copypasta execute" pasta="' + cmd + '">' + text + '</span>'
             })
             .replace(/\|(.*?)\|/g, '<span class="copypasta">$1</span>');
-         element.html(attachment.md_text);
+         element.html(attachment.text);
 
          element.insertBefore(this.div);
 

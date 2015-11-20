@@ -4,7 +4,7 @@ var sqldb = require('./sqldb');
 var config = require('./config/environment');
 
 // Populate databases with sample data
-if (config.seedDB) { require('./config/seed'); }
+if (config.seedDB) { require('./config/seed')(); }
 
 var UserController = require('./controller/user');
 var TokenController = require('./controller/token');

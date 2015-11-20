@@ -21,65 +21,63 @@ var Alias = sqldb.Alias;
 var modelsSmallToLarge = [Alias, Token, Fighting, Action, Fight, User, Item];
 var modelsLargeToSmall = [Item, User, Fight, Action, Fighting, Token, Alias];
 
-(function(dbSync) {
-   dbSync().then(function() {
-      
-      console.log('Creating users...');
-      return UserController.create({
-         email: 'exyphnos@gmail.com',
-         password: 'thomas'
-      }).then(function(thomas) {
+module.exports = function() {
+   var LOG = function(message) { 
+      if (!module.exports.silent) console.log(message);
+   }
 
-         return AliasController.getAlias(thomas, 'THOMASSTEINKE').then(function(alias) {
-            thomas.alias = alias;
-            alias.update({ slack_name: 'epiphane' });
-         }).then(function() {
+   return (function(dbSync) {
+      return dbSync().then(function() {
+         
+         LOG('Creating thomas...');
+         return UserController.create({
+            email: 'exyphnos@gmail.com',
+            password: 'thomas'
+         }, 'THOMASSTEINKE').then(function(thomas) {
 
-            console.log('Creating slackbot...');
+            thomas.alias.update({ slack_name: 'epiphane' });
+            
+            LOG('Creating slackbot...');
             return UserController.create({
                email: 'slackbot@thomassteinke.com',
                password: 'slackbot',
                AI: true
-            }).then(function(slackbot) {
+            }, 'THOMASSTEINKE').then(function(slackbot) {
                
-               AliasController.getAlias(slackbot, 'THOMASSTEINKE').then(function(alias) {
-                  slackbot.alias = alias;
-                  alias.update({ slack_name: 'slackbot' });
-               }).then(function() {
+               slackbot.alias.update({ slack_name: 'slackbot' });
 
-                  console.log('Creating basic fight...');
-                  return FightController.create('TESTCHANNEL', thomas, slackbot);
-
-               });
+               LOG('Creating basic fight...');
+               return FightController.create('TEST', thomas, slackbot);
             });
          });
       });
-   });
-})(function() {
-   console.log('Syncing tables...');
-   function performAll(command, models, args) {
-      var _models = [];
-      for (var i = 0; i < models.length; i ++) _models.push(models[i]);
-      models = _models;
+   })(function() {
+      LOG('Syncing tables...');
+      function performAll(command, models, args) {
+         var _models = [];
+         for (var i = 0; i < models.length; i ++) _models.push(models[i]);
+         models = _models;
 
-      var model = models.shift();
-      args = Array.prototype.slice.call(arguments, 2);
+         var model = models.shift();
+         args = Array.prototype.slice.call(arguments, 2);
 
-      console.log('Performing ' + command + ' on ' + model);
-      var promise = model[command].apply(model, args);
-      while (models.length > 0) {
-         promise = (function(model) {
-            return promise.then(function() {
-               console.log('Performing ' + command + ' on ' + model);
-               return model[command].apply(model, args);
-            })
-         })(models.shift());
+         LOG('Performing ' + command + ' on ' + model);
+         var promise = model[command].apply(model, args);
+         while (models.length > 0) {
+            promise = (function(model) {
+               return promise.then(function() {
+                  LOG('Performing ' + command + ' on ' + model);
+                  return model[command].apply(model, args);
+               })
+            })(models.shift());
+         }
+
+         return promise;
       }
 
-      return promise;
-   }
-
-   return performAll('sync', modelsLargeToSmall, { force: true }).then(function() {
-      return performAll('destroy', modelsSmallToLarge, { where: {} });
+      return performAll('sync', modelsLargeToSmall, { force: true }).then(function() {
+         return performAll('destroy', modelsSmallToLarge, { where: {} });
+      });
    });
-});
+};
+module.exports.silent = false;

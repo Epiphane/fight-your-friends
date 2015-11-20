@@ -40,7 +40,7 @@ module.exports = function(A, assert) {
          })
       },
       name: function(user, channel_id, argv) {
-         assert.usage(argv[1], '`|name| XXX`');
+         assert.usage(argv[1], '|name| XXX');
 
          return user.alias.update({
             slack_name: argv[1]
