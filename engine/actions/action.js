@@ -10,8 +10,8 @@ module.exports = function(A, assert) {
 
          // Am I in a fight?
          return FightController.requireTurn(user, channel_id, true).then(function(fight) {
-            return ItemController.getItem(user, 'move', argv[1]).then(function(move) {
-               assert(move, 'You don\'t have a move named `' + argv[1] + '`!');
+            return ItemController.getItem(user, 'move', argv.slice(1).join(' ')).then(function(move) {
+               assert(move, 'You don\'t have a move named `' + argv.slice(1).join(' ') + '`!');
 
                return FightController.useMove(fight, user, move);
             });
